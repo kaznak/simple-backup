@@ -1,0 +1,65 @@
+#!/bin/sh
+
+pname=$(basename "$0")
+stime=$(date '+%Y%m%d%H%M%S')
+tmp="/tmp/$pname.$stime.$$"
+
+trap 'rm -f $tmp-*' EXIT
+
+MSG()	{
+	echo "$pname $stime $$ $*."	>&2
+}
+
+
+#################################################################
+
+if [ 0 -eq $# ] ; then
+	MSG "INFO argument is empty, exit."
+	exit 0
+fi
+
+
+while [ 0 -lt $# ] ; do
+	echo "$1"
+	shift
+done				|
+while read f ; do
+	f=$(dirname "$f")/$(basename "$f")	# remove directory suffix '/'
+	if [ ! "$f" ] ; then
+		MSG "INFO argument is empty, skip."
+
+	elif [ -f "$f" ] ; then
+		ls -tr "$f."*		|
+		grep -E "$f.[0-9]{14}"	|
+		while read of ; do
+			if cmp -s "$of" "$f" ; then
+				MSG "INFO $f has backed up as $of."
+				touch "$tmp-found"
+				break
+			fi
+		done
+		[ -e "$tmp-found" ]	&&	break
+
+		bf="$f.$stime"
+		MSG "INFO $f will be backed up as $bf."
+		cp "$f" "$bf"
+		chmod -w "$bf"
+
+	elif [ -d "$f" ] ; then
+		bf="$f.tar.gz.$stime"
+		MSG "INFO $f will be backuped up as $bf."
+		tar -zcvf "$bf" "$f"
+		chmod -w "$bf"
+
+	else
+		MSG "ERROR argument $f is neither file nor directory."
+		touch "$tmp-ERROR"
+	fi
+done
+
+#################################################################
+[ -e "$tmp-found" ]	&&	exit 1
+[ -e "$tmp-ERROR" ]	&&	exit 2
+
+exit 0
+
