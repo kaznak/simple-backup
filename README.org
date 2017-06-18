@@ -6,9 +6,7 @@ simple backup script
 
 * Usage
 
-#+BEGIN_QUOTE
 backup <file-or-directory-name>...
-#+END_QUOTE
 
 * File tree
 
