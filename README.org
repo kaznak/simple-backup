@@ -1,0 +1,21 @@
+* COMMENT -*- Mode: org; -*-
+
+#+TITLE: simple-backup
+
+simple backup script
+
+* Usage
+
+#+BEGIN_VERSE
+backup <file-or-directory-name>...
+#+END_VERSE
+
+* File tree
+
++ simple-backup
+  + .git            : git system directory
+  - .gitignore      : git ignoring file definition
+  - README.org      : This README file
+  - LICENSE         : About License
+
+  - backup          : The script
